@@ -1,0 +1,20 @@
+﻿Record#,FName,Lname,Date of Birth,Gender,Education,House#,Address1,Address2,City,Pincode,Mobile#,Company,MonthlySalary
+16,FName16,LName16,16-01-1998,Male,B.Tech,116,Street2,Prestige Lake City,Hyderabad,560102,5463433563,Google,53072.93
+26,FName8,LName8,08-01-1998,Female,M.Tech,126,Street4,Shoba Lake Apts,Pune,600001,7893456862,Apple,71460.64
+100,FName100,LName100,23-03-1700,Female,BE,200,Street1,ABC Building,Chennai,560102,8345623730,Intel,16262.35
+118,FName118,LName118,10-04-1998,Female,BE,218,Street4,Shoba Lake Apts,Pune,600001,988764453,Apple,58620.56
+146,FName85,LName85,08-03-1998,Female,B.Com,246,Street4,Shoba Lake Apts,Pune,600001,8345623976,Apple,35940.35
+150,FName150,LName150,12-03-2028,Female,MBA,250,Street1,ABC Building,Chennai,560102,8345623997,Intel,11354.92
+159,FName159,LName159,21-03-1998,,MBA,259,Street3,Brigade Towers,Mumbai,400001,8345624050,Microsoft,79057.29
+252,FName252,LName252,22-06-1900,Male,BBA,352,Street2,Prestige Lake City,Hyderabad,560102,9003423819,Google,5788.19
+290,FName290,LName290,30-07-1998,,B.Com,390,Street1,ABC Building,Chennai,560102,9003423993,Intel,70318.92
+292,FName292,LName292,01-08-1998,,BCA,392,Street2,Prestige Lake City,Hyderabad,560102,9003424003,Google,118203.4
+325,FName274,LName274,14-07-1998,Female,BE,425,Street1,ABC Building,Chennai,560102,9003424184,Intel,6183.48
+336,FName336,LName336,25-XX-1998,Male,B.Sc,436,Street2,Prestige Lake City,Hyderabad,560102,9003424250,Google,123853.1
+367,FName367,LName367,25-08-1998,,B.Tech,467,Street5,Kingpin Apts,Bangalore,560102,9003424390,Infosys,7870.29
+371,FName371,LName371,29-08-1998,,B.Com,471,Street5,Kingpin Apts,Bangalore,560102,9003424412,Infosys,1820.78
+461,FName461,LName461,27-11-1998,Male,B.Com,561,Street5,Kingpin Apts,Bangalore,560102,3342356733,Infosys,29482.66
+659,FName517,LName517,22-01-1999,Female,B.Com,759,Street5,Kingpin Apts,Bangalore,560102,9003425833,Infosys,26585.63
+820,FName820,LName820,02-07-2026,Female,BE,920,Street1,ABC Building,Chennai,560102,9003426662,Intel,15098.52
+1228,FName972,LName972,01-12-1999,Male,BCA,1328,Street2,Prestige Lake City,Hyderabad,560102,9003428747,Google,34361.57
+1993,FName1944,LName1944,16-11-2001,Female,BCA,2093,Street5,Kingpin Apts,Bangalore,560102,7896535787,Infosys,25751.03
