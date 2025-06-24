@@ -21,12 +21,20 @@ import com.csv.file.model.MemberId;
 import com.csv.file.repository.MemberRepository;
 import com.opencsv.CSVReader;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
+
 @Service
 public class CsvService {
 
     @Autowired
     private MemberRepository repository;
-
+    
+    @PersistenceContext
+    private EntityManager manager;
+    
+    @Transactional
     public UploadResponse processCSV(MultipartFile file) {
         int validCount = 0;
         int invalidCount = 0;
@@ -130,12 +138,14 @@ public class CsvService {
                 member.setCompany(company);
                 member.setMonthlySalary(salary);
 
-                repository.save(member);
+//                repository.save(member);
+                System.out.println("next line to persist");
+                manager.persist(member);
                 validCount++;
             }
 
         } catch (Exception e) {
-        	  throw new CsvProcessingException("Internal error occurred: " );        }
+        	  throw new CsvProcessingException("Internal error occurred: "+e.getMessage() );        }
 
         long endTime = System.currentTimeMillis();
         return new UploadResponse(validCount,invalidCount,(endTime - startTime),"csv processed successfully");
