@@ -2,12 +2,14 @@ package com.csv.file.model;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Member {
 
     @EmbeddedId
@@ -22,6 +24,9 @@ public class Member {
     private String mobile;
     private String company;
     private Double monthlySalary;
+    private Integer memberRecord;
+    
+
 
    
 }

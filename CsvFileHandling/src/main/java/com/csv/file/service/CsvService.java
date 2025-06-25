@@ -5,12 +5,14 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,39 +29,42 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class CsvService {
-
-    @Autowired
-    private MemberRepository repository;
+   @Autowired
+   private MemberRepository memberRepository;
     
     @PersistenceContext
-    private EntityManager manager;
+    private EntityManager entityManager;
     
-    @Transactional
+   @Transactional
     public UploadResponse processCSV(MultipartFile file) {
+    	System.out.println("service");
         int validCount = 0;
         int invalidCount = 0;
+        int batchSize = 100;
+        List<Member> batchList = new ArrayList<>();
         long startTime = System.currentTimeMillis();
         try (CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
 
             Set<String> uniqueChecker = new HashSet<>();//to maintain uniqueness
             String[] columns = reader.readNext(); // Header
             //Checking header is null or not having expected columns
-            if (columns == null || columns.length < 14) {
+            if (columns == null || columns.length <14) {
                 throw new CsvProcessingException("CSV header is invalid or missing columns");
             }
 
             String[] row;
             while ((row = reader.readNext()) != null) {
-                if (row.length < 14) {
+                if (row.length <14) {
                     invalidCount++;
                     continue;
                 }
-
+                 //checking fields with null
                 for (int i = 0; i < row.length; i++) {
-                    row[i] = row[i] != null ? row[i].trim() : "";
+                    row[i] = row[i] != null ? row[i].trim() : "";//ternary operator
                 }
 
                 // fields are created for necessary validations validations
+               
                 String firstName = row[1];
                 String lastName = row[2];
                 String dobStr = row[3];
@@ -73,6 +78,8 @@ public class CsvService {
                 String mobile = row[11];
                 String company = row[12];
                 String salaryStr = row[13];
+                String memberRecord=row[0];
+              
 
                 // Basic empty check for important fields
                 if (firstName.isEmpty() || lastName.isEmpty() || gender.isEmpty() ||
@@ -123,6 +130,13 @@ public class CsvService {
                     invalidCount++;
                     continue;
                 }
+                Integer memberRecord1;
+                try {
+                    memberRecord1 = Integer.parseUnsignedInt(memberRecord);
+                } catch (NumberFormatException e) {
+                    invalidCount++;
+                    continue; // skip this record if it's not a valid number
+                }
 
                 // Create and save entity
                 MemberId memberId = new MemberId(firstName, lastName, gender, dob);
@@ -137,11 +151,25 @@ public class CsvService {
                 member.setMobile(mobile);
                 member.setCompany(company);
                 member.setMonthlySalary(salary);
+                member.setMemberRecord(memberRecord1);
+                
+                batchList.add(member);
 
-//                repository.save(member);
-                System.out.println("next line to persist");
-                manager.persist(member);
+
                 validCount++;
+                int  bCount=0;
+                if (batchList.size() == batchSize) {
+                    saveBatch(batchList);  //Here batch-100records are Save & commit 
+                    System.out.println(bCount++ +"************************************************8");
+                    batchList.clear();//list clear
+                    
+            }
+
+            if (!batchList.isEmpty()) {
+                saveBatch(batchList); // Final batch
+            }
+                
+                
             }
 
         } catch (Exception e) {
@@ -150,5 +178,24 @@ public class CsvService {
         long endTime = System.currentTimeMillis();
         return new UploadResponse(validCount,invalidCount,(endTime - startTime),"csv processed successfully");
     }
+    
+    @Transactional // this methods runs for every batch transaction
+    public void saveBatch(List<Member> batch) {
+    	  for (Member member : batch) {
+              MemberId id = member.getId();
+              memberRepository.insertMember(
+                  id.getFirstName(), id.getLastName(), id.getGender(), id.getDateOfBirth(),
+                  member.getEducation(), member.getHouseNumber(), member.getAddress1(), member.getAddress2(),
+                  member.getCity(), member.getPincode(), member.getMobile(), member.getCompany(),
+                  member.getMonthlySalary(), member.getMemberRecord()
+              );
+          }
+    }
+
+    //getting members based on dob on requirement
+	public List<Member> getMembersByDateOfBirth(LocalDate startDate, LocalDate endDate) {
+		 List<Member> members = memberRepository.findDateOfBirth(startDate, endDate);
+	        return members;
+	}
 }
 
