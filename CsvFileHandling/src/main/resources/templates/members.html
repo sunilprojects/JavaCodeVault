@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Members List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Members List </h2>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Gender</th>
+                <th>DOB</th>
+                <th>Education</th>
+                <th>City</th>
+                <th>Company</th>
+                <th>Mobile</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="member : ${memberPage.content}">
+                <td th:text="${member.id.firstName}"></td>
+                <td th:text="${member.id.lastName}"></td>
+                <td th:text="${member.id.gender}"></td>
+                <td th:text="${member.id.dateOfBirth}"></td>
+                <td th:text="${member.education}"></td>
+                <td th:text="${member.city}"></td>
+                <td th:text="${member.company}"></td>
+                <td th:text="${member.mobile}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Bootstrap Pagination -->
+<div class="container mt-4">
+  <div class="d-flex justify-content-center align-items-center flex-wrap gap-2">
+
+    <!-- Pagination -->
+    <nav>
+    <!-- Group pagination 3 at a time: 1 2 3 → 4 5 6 → 7 8 9 -->
+<ul class="pagination mb-0">
+
+  <!-- Previous Group -->
+  <li class="page-item" th:if="${currentPage >= 3}">
+    <a class="page-link"
+       th:href="@{/members(page=${(currentPage / 3 - 1) * 3}, size=${pageSize})}">Previous</a>
+  </li>
+
+  <!-- Pages in current group -->
+  <li class="page-item"
+      th:each="i : ${#numbers.sequence((currentPage / 3) * 3, T(java.lang.Math).min((currentPage / 3) * 3 + 2, totalPages - 1))}"
+      th:classappend="${i == currentPage} ? 'active'">
+    <a class="page-link"
+       th:href="@{/members(page=${i}, size=${pageSize})}"
+       th:text="${i + 1}">1</a>
+  </li>
+
+  <!-- Next Group -->
+  <li class="page-item" th:if="${(currentPage / 3) * 3 + 3 < totalPages}">
+    <a class="page-link"
+       th:href="@{/members(page=${(currentPage / 3 + 1) * 3}, size=${pageSize})}">Next</a>
+  </li>
+
+</ul>
+
+    </nav>
+
+    <!-- Go to page input -->
+    <form th:action="@{/members}" method="get" class="d-flex align-items-center ms-3">
+      <label class="me-2 mb-0 fw-bold">Page</label>
+      <input type="number"
+             name="page"
+             min="1"
+             th:attr="max=${totalPages}"
+             placeholder="1"
+             class="form-control form-control-sm me-2"
+             style="width: 80px;" />
+      <input type="hidden" name="size" th:value="${pageSize}" />
+      <button type="submit" class="btn btn-sm btn-outline-primary">Go</button>
+    </form>
+
+  </div>
+</div>
+
+
+</div>
+
+<!-- Bootstrap Bundle JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

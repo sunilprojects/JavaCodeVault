@@ -8,11 +8,9 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,26 +25,20 @@ import com.opencsv.CSVReader;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-@Slf4j
+import jakarta.websocket.server.ServerEndpoint;
 @Service
-public class CsvService {
-	@Autowired
-	private MemberRepository memberRepository;
+public class CsvSingleTransactionService {
+//	@Autowired
+//	private MemberRepository memberRepository;
 
 	@PersistenceContext
 	private EntityManager entityManager;
-	
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
 
 	@Transactional
 	public UploadResponse processCSV(MultipartFile file) {
 		System.out.println("service");
 		int validCount = 0;
 		int invalidCount = 0;
-		int batchSize = 100;
-		List<Member> batchList = new ArrayList<>();
 		long startTime = System.currentTimeMillis();
 		try (CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
 
@@ -156,20 +148,10 @@ public class CsvService {
 				member.setMonthlySalary(salary);
 				member.setMemberRecord(memberRecord1);
 
-				    batchList.add(member);
+				entityManager.persist(member);
+
 				    validCount++;
-
-				    if (batchList.size() == batchSize) {
-				        saveBatch(batchList);  // 🔁 commit batch
-				        batchList.clear();
-				    }
-
 			}
-
-			if (!batchList.isEmpty()) {
-			    saveBatch(batchList);  // Final partial batch
-			}
-		
 		} catch (Exception e) {
 			throw new CsvProcessingException("Internal error occurred: "+e.getMessage() );        }
 
@@ -177,41 +159,4 @@ public class CsvService {
 		return new UploadResponse(validCount,invalidCount,(endTime - startTime),"csv processed successfully");
 	}
 
-	@Transactional
-	public void saveBatch(List<Member> batch) {
-		String sql = "INSERT INTO member (first_name, last_name, gender, date_of_birth, " +
-		        "education, house_number, address1, address2, city, pincode, mobile, " +
-		        "company, monthly_salary, member_record) " +
-		        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
-		        "ON CONFLICT (date_of_birth, first_name, gender, last_name) DO NOTHING";//Postgres to ignore rows that would violate a unique constraint — no error will be thrown.
-    //batchUpdate() is used to execute multiple SQL update/insert/delete operations in one batch
-	    jdbcTemplate.batchUpdate(sql, batch, batch.size(), (ps, member) -> {
-	        MemberId id = member.getId();
-	        ps.setString(1, id.getFirstName());
-	        ps.setString(2, id.getLastName());
-	        ps.setString(3, id.getGender());
-	        ps.setObject(4, id.getDateOfBirth());
-	        ps.setString(5, member.getEducation());
-	        ps.setString(6, member.getHouseNumber());
-	        ps.setString(7, member.getAddress1());
-	        ps.setString(8, member.getAddress2());
-	        ps.setString(9, member.getCity());
-	        ps.setString(10, member.getPincode());
-	        ps.setString(11, member.getMobile());
-	        ps.setString(12, member.getCompany());
-	        ps.setDouble(13, member.getMonthlySalary());
-	        ps.setInt(14, member.getMemberRecord());
-	    });
-
-	    log.info("Committed batch of size: " + batch.size());
-	    System.out.flush();
-	}
-
-	
-	//getting members based on dob on requirement
-	public List<Member> getMembersByDateOfBirth(LocalDate startDate, LocalDate endDate) {
-		List<Member> members = memberRepository.findDateOfBirth(startDate, endDate);
-		return members;
-	}
 }
-

@@ -2,14 +2,13 @@ package com.csv.file.repository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
 import com.csv.file.dto.MemberDTO;
 import com.csv.file.dto.MemberDetails;
 import com.csv.file.model.Member;
@@ -93,5 +92,7 @@ public interface MemberRepository  extends JpaRepository<Member, MemberId>{
         WHERE monthly_salary >=:sal
  		""", nativeQuery = true)
     List<MemberDetails> findHighestSalaryMembers(@Param(value="sal") double salary);
+ 
+ Page<Member> findAll(Pageable pageable);
 	    
 }
